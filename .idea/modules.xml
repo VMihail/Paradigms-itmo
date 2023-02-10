@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Paradigms-itmo.iml" filepath="$PROJECT_DIR$/Paradigms-itmo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java-solutions/java-solutions.iml" filepath="$PROJECT_DIR$/java-solutions/java-solutions.iml" />
+      <module fileurl="file://$PROJECT_DIR$/javascript-solutions/javascript-solutions.iml" filepath="$PROJECT_DIR$/javascript-solutions/javascript-solutions.iml" />
     </modules>
   </component>
 </project>
