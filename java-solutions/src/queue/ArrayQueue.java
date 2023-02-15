@@ -1,124 +1,71 @@
 package queue;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Predicate;
 
-public class ArrayQueue extends AbstractQueue {
-  private Object[] elements;
-  private int head, tail;
-  private static final int startLen = 10;
-
-  private void expand() {
-    final int MOD = elements.length;
-    if (size == MOD) {
-      Object[] newElements = new Object[2 * MOD];
-      for (int i = 0; i < MOD; i++) {
-        newElements[i] = elements[head++ % MOD];
-      }
-      head = 0;
-      tail = MOD;
-      elements = newElements;
-    }
-  }
+public class ArrayQueue {
+  private static final int DEFAULT_CAPACITY = 10;
+  private  Object[] array;
+  private  int head, tail, size;
 
   public ArrayQueue() {
-    elements = new Object[startLen];
+    array = new Object[DEFAULT_CAPACITY];
   }
 
-  private ArrayQueue(Object[] elements, int head, int tail, int size) {
-    this.elements = elements;
-    this.head = head;
-    this.tail = tail;
-    super.size = size;
+  public ArrayQueue(int capacity) {
+    array = new Object[capacity];
   }
 
-  public int indexOf(Object element) {
+  public void enqueue(Object element) {
     Objects.requireNonNull(element);
-    int saveHead = head;
-    for (int i = 0; i < size; i++) {
-      if (elements[saveHead++ % elements.length].equals(element)) {
-        return i;
-      }
+    if (filledUp()) {
+      ensureCapacity();
     }
-    return -1;
+    array[tail++ % array.length] = element;
+    ++size;
   }
 
-  public int lastIndexOf(Object element) {
-    Objects.requireNonNull(element);
-    int result = -1;
-    int saveHead = head;
-    for (int i = 0; i < size; i++) {
-      if (elements[saveHead++ % elements.length].equals(element)) {
-        result = i;
-      }
-    }
-    return result;
+  public Object element() {
+    assert size > 0;
+    return array[head % array.length];
   }
 
-  @Override
-  protected void enqueueImpl(Object element) {
-    expand();
-    elements[tail++ % elements.length] = element;
-  }
-
-  @Override
-  protected Object elementImpl() {
-    return elements[head % elements.length];
-  }
-
-  @Override
-  protected Object dequeueImpl() {
-    final int MOD = elements.length;
-    Object result = elements[head % MOD];
-    elements[head % MOD] = null;
+  public Object dequeue() {
+    assert size > 0;
+    --size;
+    final int MOD = array.length;
+    final Object result = array[head % MOD];
+    array[head % MOD] = null;
     head = (head + 1) % MOD;
     return result;
   }
 
-  @Override
-  protected void clearImpl() {
-    elements = new Object[startLen];
-    head = tail = 0;
+  public int size() {
+    return size;
   }
 
-  private ArrayQueue copy() {
-    Object[] array = new Object[elements.length];
-    System.arraycopy(elements, 0, array, 0, elements.length);
-    return new ArrayQueue(array, head, tail, size);
+  public boolean isEmpty() {
+    return size == 0;
   }
 
-  @Override
-  protected int indexIfImpl(Predicate<Object> predicate) {
-    // :NOTE: inefficient ~version of indexOf
-    Queue queue = copy();
-    int index = 0;
-    while (!queue.isEmpty()) {
-      Object remove = queue.dequeue();
-      if (predicate.test(remove)) {
-        return index;
-      }
-      ++index;
-    }
-    return -1;
+  public void clear() {
+    Arrays.fill(array, null);
+    array = new Object[DEFAULT_CAPACITY];
+    head = tail = size = 0;
   }
 
-  @Override
-  protected int lastIndexIfImpl(Predicate<Object> predicate) {
-    Deque<Object> stack = new ArrayDeque<>();
-    Queue queue = copy();
-    while (!queue.isEmpty()) {
-      stack.push(queue.dequeue());
+  private boolean filledUp() {
+    return size == array.length;
+  }
+
+  private void ensureCapacity() {
+    final int MOD = array.length;
+    final Object[] newElements = new Object[MOD << 1];
+    for (int i = 0; i < MOD; i++) {
+      newElements[i] = array[head++ % MOD];
     }
-    int index = stack.size() - 1;
-    while (!stack.isEmpty()) {
-      Object remove = stack.pop();
-      if (predicate.test(remove)) {
-        return index;
-      }
-      --index;
-    }
-    return -1;
+    head = 0;
+    tail = MOD;
+    array = newElements;
   }
 }

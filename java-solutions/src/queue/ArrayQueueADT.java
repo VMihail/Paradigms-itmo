@@ -1,84 +1,91 @@
 package queue;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class ArrayQueueADT {
-  private Object[] elements;
-  private int head, tail, size;
   private static final int DEFAULT_CAPACITY = 10;
+  private Object[] array;
+  private int head, tail, size;
 
   public ArrayQueueADT() {
-    elements = new Object[DEFAULT_CAPACITY];
+    array = new Object[DEFAULT_CAPACITY];
   }
 
-  public static void enqueue(final ArrayQueueADT queue, final Object element) {
+  public ArrayQueueADT(int capacity) {
+    array = new Object[capacity];
+  }
+
+  // Pred: element != null && arrayQueueADT != null
+  // Post: n' == n + 1 && a[n] == element && Immutable
+  public static void enqueue(final ArrayQueueADT arrayQueueADT, final Object element) {
+    Objects.requireNonNull(arrayQueueADT);
     Objects.requireNonNull(element);
-    ensureCapacity(queue);
-    queue.elements[queue.tail++ % queue.elements.length] = element;
-    ++queue.size;
+    if (filledUp(arrayQueueADT)) {
+      ensureCapacity(arrayQueueADT);
+    }
+    arrayQueueADT.array[arrayQueueADT.tail++ % arrayQueueADT.array.length] = element;
+    ++arrayQueueADT.size;
   }
 
-  public static Object element(final ArrayQueueADT queue) {
-    assert queue.size > 0;
-    return queue.elements[queue.head % queue.elements.length];
+  // Pred: n > 0 && arrayQueueADT != null
+  // Post: result == a[n] && Immutable
+  public static Object element(final ArrayQueueADT arrayQueueADT) {
+    Objects.requireNonNull(arrayQueueADT);
+    assert arrayQueueADT.size > 0;
+    return arrayQueueADT.array[arrayQueueADT.head % arrayQueueADT.array.length];
   }
 
-  public static Object dequeue(final ArrayQueueADT queue) {
-    assert queue.size > 0;
-    --queue.size;
-    final int MOD = queue.elements.length;
-    Object result = queue.elements[queue.head % MOD];
-    queue.elements[queue.head % MOD] = null;
-    queue.head = (queue.head + 1) % MOD;
+  // Pred: n > 0 && arrayQueueADT != null
+  // Post: result == a[n] && n' == n - 1 && Immutable
+  public static Object dequeue(final ArrayQueueADT arrayQueueADT) {
+    Objects.requireNonNull(arrayQueueADT);
+    assert arrayQueueADT.size > 0;
+    --arrayQueueADT.size;
+    final int MOD = arrayQueueADT.array.length;
+    final Object result = arrayQueueADT.array[arrayQueueADT.head % MOD];
+    arrayQueueADT.array[arrayQueueADT.head % MOD] = null;
+    arrayQueueADT.head = (arrayQueueADT.head + 1) % MOD;
     return result;
   }
 
-  public static int size(final ArrayQueueADT queue) {
-    return queue.size;
+  // Pred: arrayQueueADT != null
+  // Post: result == n && Immutable
+  public static int size(final ArrayQueueADT arrayQueueADT) {
+    Objects.requireNonNull(arrayQueueADT);
+    return arrayQueueADT.size;
   }
 
-  public static boolean isEmpty(final ArrayQueueADT queue) {
-    return queue.size == 0;
+  // Pred: arrayQueueADT != null
+  // Post: result == (n == 0) && Immutable
+  public static boolean isEmpty(final ArrayQueueADT arrayQueueADT) {
+    Objects.requireNonNull(arrayQueueADT);
+    return arrayQueueADT.size == 0;
   }
 
-  public static void clear(final ArrayQueueADT queue) {
-    queue.elements = new Object[DEFAULT_CAPACITY];
-    queue.head = queue.tail = queue.size = 0;
+  // Pred: arrayQueueADT != null
+  // Post: n == 0
+  public static void clear(final ArrayQueueADT arrayQueueADT) {
+    Objects.requireNonNull(arrayQueueADT);
+    Arrays.fill(arrayQueueADT.array, null);
+    arrayQueueADT.array = new Object[DEFAULT_CAPACITY];
+    arrayQueueADT.head = arrayQueueADT.tail = arrayQueueADT.size = 0;
   }
 
-  public static int indexOf(final ArrayQueueADT queue, Object element) {
-    Objects.requireNonNull(element);
-    int saveHead = queue.head;
-    for (int i = 0; i < queue.size; i++) {
-      if (queue.elements[saveHead++ % queue.elements.length].equals(element)) {
-        return i;
-      }
+  private static boolean filledUp(final ArrayQueueADT arrayQueueADT) {
+    Objects.requireNonNull(arrayQueueADT);
+    return arrayQueueADT.size == arrayQueueADT.array.length;
+  }
+
+  private static void ensureCapacity(final ArrayQueueADT arrayQueueADT) {
+    Objects.requireNonNull(arrayQueueADT);
+    final int MOD = arrayQueueADT.array.length;
+    final Object[] newElements = new Object[MOD << 1];
+    for (int i = 0; i < MOD; i++) {
+      newElements[i] = arrayQueueADT.array[arrayQueueADT.head++ % MOD];
     }
-    return -1;
-  }
-
-  public static int lastIndexOf(final ArrayQueueADT queue, Object element) {
-    Objects.requireNonNull(element);
-    int result = -1;
-    int saveHead = queue.head;
-    for (int i = 0; i < queue.size; i++) {
-      if (queue.elements[saveHead++ % queue.elements.length].equals(element)) {
-        result = i;
-      }
-    }
-    return result;
-  }
-
-  private static void ensureCapacity(final ArrayQueueADT queue) {
-    final int MOD = queue.elements.length;
-    if (queue.size == MOD) {
-      Object[] newElements = new Object[MOD << 1];
-      for (int i = 0; i < MOD; i++) {
-        newElements[i] = queue.elements[queue.head++ % MOD];
-      }
-      queue.head = 0;
-      queue.tail = MOD;
-      queue.elements = newElements;
-    }
+    arrayQueueADT.head = 0;
+    arrayQueueADT.tail = MOD;
+    arrayQueueADT.array = newElements;
   }
 }

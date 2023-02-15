@@ -3,10 +3,14 @@ import java.util.*;
 
 public class Problem {
   public static void main(String[] args) {
-    final SimpleFastScanner in = new SimpleFastScanner(System.in);
-    final PrintWriter out = new PrintWriter(System.out);
-    new Solver(in, out).solve();
-    out.close();
+    try (
+      final SimpleFastScanner in = new SimpleFastScanner(System.in);
+      final PrintWriter out = new PrintWriter(System.out)
+      ) {
+      new Solver(in, out).solve();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   static class Solver {
@@ -27,22 +31,7 @@ public class Problem {
     }
 
     private void solveOne() {
-      System.out.println(flipBit(13, 1));
-    }
 
-    public static int flipBit(int value, int bitIndex) {
-      --bitIndex;
-      StringBuilder binary = new StringBuilder();
-      while (value > 0) {
-        binary.append(value % 2);
-        value >>= 1;
-      }
-      while (binary.length() < 32) {
-        binary.append("0");
-      }
-      binary.reverse();
-      binary.setCharAt(31 - bitIndex, binary.charAt(31 - bitIndex) == '0' ? '1' : '0');
-      return Integer.parseInt(binary.toString(), 2);
     }
   }
 
