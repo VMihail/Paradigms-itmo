@@ -2,9 +2,7 @@ package queue.tests;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import queue.ArrayQueue;
-import queue.ArrayQueueADT;
-import queue.ArrayQueueModule;
+import queue.*;
 
 /**
  * @author VMihail (vmihail399@gmail.com)
@@ -46,7 +44,22 @@ public class QueueTest {
   @Test
   public void ArrayQueueTest() {
     final int size = 25;
-    final ArrayQueue arrayQueue = new ArrayQueue();
+    final Queue arrayQueue = new ArrayQueue();
+    for (int i = 0; i < size; i++) {
+      arrayQueue.enqueue(i);
+    }
+    Assertions.assertEquals(size, arrayQueue.size());
+    while (!arrayQueue.isEmpty()) {
+      Assertions.assertEquals(arrayQueue.element(), arrayQueue.dequeue());
+    }
+    Assertions.assertTrue(arrayQueue.isEmpty());
+    arrayQueue.clear();
+  }
+
+  @Test
+  public void LinkedQueueTest() {
+    final int size = 25;
+    final Queue arrayQueue = new LinkedQueue();
     for (int i = 0; i < size; i++) {
       arrayQueue.enqueue(i);
     }

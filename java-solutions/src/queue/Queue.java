@@ -57,9 +57,5 @@ public interface Queue {
    */
   void clear();
 
-  /*
-   * Модификация, добавлю позже
-   */
-  int indexIf(Predicate<Object> predicate);
-  int lastIndexIf(Predicate<Object> predicate);
+  Object[] toArray();
 }

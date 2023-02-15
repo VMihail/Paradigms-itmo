@@ -1,12 +1,9 @@
 package queue;
 
-import java.util.Arrays;
-import java.util.Objects;
-
-public class ArrayQueue {
+public class ArrayQueue extends AbstractQueue {
   private static final int DEFAULT_CAPACITY = 10;
-  private  Object[] array;
-  private  int head, tail, size;
+  private Object[] array;
+  private int head, tail;
 
   public ArrayQueue() {
     array = new Object[DEFAULT_CAPACITY];
@@ -16,8 +13,8 @@ public class ArrayQueue {
     array = new Object[capacity];
   }
 
-  public void enqueue(Object element) {
-    Objects.requireNonNull(element);
+  @Override
+  protected void enqueueImpl(Object element) {
     if (filledUp()) {
       ensureCapacity();
     }
@@ -25,14 +22,13 @@ public class ArrayQueue {
     ++size;
   }
 
-  public Object element() {
-    assert size > 0;
+  @Override
+  protected Object elementImpl() {
     return array[head % array.length];
   }
 
-  public Object dequeue() {
-    assert size > 0;
-    --size;
+  @Override
+  protected Object dequeueImpl() {
     final int MOD = array.length;
     final Object result = array[head % MOD];
     array[head % MOD] = null;
@@ -40,16 +36,8 @@ public class ArrayQueue {
     return result;
   }
 
-  public int size() {
-    return size;
-  }
-
-  public boolean isEmpty() {
-    return size == 0;
-  }
-
-  public void clear() {
-    Arrays.fill(array, null);
+  @Override
+  protected void clearImpl() {
     array = new Object[DEFAULT_CAPACITY];
     head = tail = size = 0;
   }

@@ -1,16 +1,21 @@
 package queue;
 
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 public abstract class AbstractQueue implements Queue {
   protected int size;
 
   @Override
-  public void enqueue(Object element) {
+  public void enqueue(final Object element) {
     Objects.requireNonNull(element);
     enqueueImpl(element);
-    ++size;
+  }
+
+  @Override
+  public Object element() {
+    assert size > 0;
+    return elementImpl();
   }
 
   @Override
@@ -18,12 +23,6 @@ public abstract class AbstractQueue implements Queue {
     assert size > 0;
     --size;
     return dequeueImpl();
-  }
-
-  @Override
-  public Object element() {
-    assert size > 0;
-    return elementImpl();
   }
 
   @Override
@@ -38,20 +37,19 @@ public abstract class AbstractQueue implements Queue {
 
   @Override
   public void clear() {
-    size = 0;
+    Arrays.fill(toArray(), null);
     clearImpl();
   }
 
   @Override
-  public int indexIf(Predicate<Object> predicate) {
-    Objects.requireNonNull(predicate);
-    return indexIfImpl(predicate);
-  }
-
-  @Override
-  public int lastIndexIf(Predicate<Object> predicate) {
-    Objects.requireNonNull(predicate);
-    return lastIndexIfImpl(predicate);
+  public Object[] toArray() {
+    final Object[] result = new Object[size];
+    for (int i = 0; i < size; i++) {
+      final Object nextElement = dequeue();
+      result[i] = nextElement;
+      enqueue(nextElement);
+    }
+    return result;
   }
 
   protected abstract void enqueueImpl(Object element);
@@ -61,9 +59,5 @@ public abstract class AbstractQueue implements Queue {
   protected abstract Object dequeueImpl();
 
   protected abstract void clearImpl();
-
-  protected abstract int indexIfImpl(Predicate<Object> predicate);
-
-  protected abstract int lastIndexIfImpl(Predicate<Object> predicate);
 }
 
