@@ -8,7 +8,7 @@ public class BinarySearchShift {
     int left = -1, right = array.length;
     // Inv: min(array) in (left; right)
     while (right > left + 1) {
-      int middle = (right - left) / 2 + left;
+      int middle = Utils.getMiddle(left, right);
       // middle in (left, right) && min(array) in (left, right)
       if (array[middle] > array[array.length - 1]) {
         // middle in (left, right) && min(array) in (left, right) && left in (left, right)
@@ -33,7 +33,7 @@ public class BinarySearchShift {
       // Inv: min(array) == right' && min(array) in (left; right) => left' + 1 == right' == min(array)
       return right;
     }
-    int middle = (right - left) / 2 + left;
+    int middle = Utils.getMiddle(left, right);
     // middle in (left; right) && min(array) in (left; right)
     if (array[middle] > array[array.length - 1]) {
       // left' == middle
